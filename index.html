@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectar ao Bluetooth</title>
+</head>
+<body>
+    <h1>Conectar ao Dispositivo Bluetooth</h1>
+    <button id="connectButton">Conectar</button>
+    <p id="status">Status: Desconectado</p>
+
+    <script>
+        const connectButton = document.getElementById('connectButton');
+        const statusText = document.getElementById('status');
+        
+        // Função para conectar ao dispositivo Bluetooth
+        connectButton.addEventListener('click', async () => {
+            try {
+                // Solicita ao usuário a seleção de um dispositivo Bluetooth com suporte a BLE
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true, // Aceita todos os dispositivos (pode ser filtrado por nome ou UUID)
+                    optionalServices: ['battery_service'] // Exemplo: Buscar o serviço de bateria (pode ser alterado conforme necessário)
+                });
+                
+                statusText.textContent = `Conectado a: ${device.name}`;
+                console.log(`Dispositivo conectado: ${device.name}`);
+                
+                // Conecta ao dispositivo e obtém o serviço solicitado
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('battery_service');
+                const characteristic = await service.getCharacteristic('battery_level');
+                
+                // Lê o nível de bateria
+                const value = await characteristic.readValue();
+                console.log(`Nível de bateria: ${value.getUint8(0)}%`);
+                statusText.textContent += ` | Nível de bateria: ${value.getUint8(0)}%`;
+
+            } catch (error) {
+                console.log('Falha ao conectar ao dispositivo Bluetooth:', error);
+                statusText.textContent = 'Erro ao conectar ao dispositivo Bluetooth';
+            }
+        });
+    </script>
+</body>
+</html>
