@@ -1,44 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conectar ao Bluetooth</title>
+    <title>Connect to Bluetooth Device</title>
 </head>
 <body>
-    <h1>Conectar ao Dispositivo Bluetooth</h1>
-    <button id="connectButton">Conectar</button>
-    <p id="status">Status: Desconectado</p>
+    <h1>Connect to Bluetooth Device</h1>
+    <button id="connectButton">Connect</button>
+    <p id="status">Status: Disconnected</p>
 
     <script>
         const connectButton = document.getElementById('connectButton');
         const statusText = document.getElementById('status');
         
-        // Função para conectar ao dispositivo Bluetooth
+        // Function to connect to a Bluetooth device
         connectButton.addEventListener('click', async () => {
             try {
-                // Solicita ao usuário a seleção de um dispositivo Bluetooth com suporte a BLE
+                // Prompt the user to select a Bluetooth device with BLE support
                 const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true, // Aceita todos os dispositivos (pode ser filtrado por nome ou UUID)
-                    optionalServices: ['battery_service'] // Exemplo: Buscar o serviço de bateria (pode ser alterado conforme necessário)
+                    acceptAllDevices: true, // Accept all devices (can be filtered by name or UUID)
+                    optionalServices: ['battery_service'] // Example: Look for battery service (can be changed as needed)
                 });
                 
-                statusText.textContent = `Conectado a: ${device.name}`;
-                console.log(`Dispositivo conectado: ${device.name}`);
+                statusText.textContent = `Connected to: ${device.name}`;
+                console.log(`Device connected: ${device.name}`);
                 
-                // Conecta ao dispositivo e obtém o serviço solicitado
+                // Connect to the device and get the requested service
                 const server = await device.gatt.connect();
                 const service = await server.getPrimaryService('battery_service');
                 const characteristic = await service.getCharacteristic('battery_level');
                 
-                // Lê o nível de bateria
+                // Read the battery level
                 const value = await characteristic.readValue();
-                console.log(`Nível de bateria: ${value.getUint8(0)}%`);
-                statusText.textContent += ` | Nível de bateria: ${value.getUint8(0)}%`;
+                console.log(`Battery level: ${value.getUint8(0)}%`);
+                statusText.textContent += ` | Battery level: ${value.getUint8(0)}%`;
 
             } catch (error) {
-                console.log('Falha ao conectar ao dispositivo Bluetooth:', error);
-                statusText.textContent = 'Erro ao conectar ao dispositivo Bluetooth';
+                console.log('Failed to connect to the Bluetooth device:', error);
+                statusText.textContent = 'Error connecting to Bluetooth device';
             }
         });
     </script>
